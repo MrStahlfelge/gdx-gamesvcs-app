@@ -20,7 +20,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "gdx-gamesvcs-app"
-        gdxVersion = '1.9.5'
+        gdxVersion = '1.9.6'
         roboVMVersion = '2.3.0'
     }
 
@@ -40,6 +40,7 @@ project(":desktop") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-desktop:0.0.1-SNAPSHOT"
     }
 }
 
@@ -56,6 +57,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android:0.0.1-SNAPSHOT"
     }
 }
 
@@ -70,6 +72,7 @@ project(":ios") {
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios:0.0.1-SNAPSHOT"
     }
 }
 
@@ -83,6 +86,9 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html:0.0.1-SNAPSHOT"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:0.0.1-SNAPSHOT:sources"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html:0.0.1-SNAPSHOT:sources"
     }
 }
 
@@ -92,6 +98,7 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:0.0.1-SNAPSHOT"
     }
 }
 
@@ -104,6 +111,7 @@ project(":ios-moe") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-moe:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios-moe:0.0.1-SNAPSHOT"
     }
 }
 
