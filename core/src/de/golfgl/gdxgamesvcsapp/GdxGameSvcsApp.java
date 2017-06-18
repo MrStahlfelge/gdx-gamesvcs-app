@@ -23,12 +23,10 @@ import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
 public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceListener {
+    public IGameServiceClient gsClient;
     Skin skin;
     Stage stage;
-
     SpriteBatch batch;
-    IGameServiceClient gsClient;
-
     Label gsStatus;
     Label gsUsername;
     private TextButton signInButton;
@@ -48,6 +46,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         prepareUI();
 
         gsClient.connect(true);
+
         // needed in case the connection is pending
         refreshStatusLabel();
     }
@@ -267,7 +266,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
     @Override
     public void gsErrorMsg(String msg) {
-
+        Gdx.app.error("GS_ERROR", msg);
     }
 
     @Override
