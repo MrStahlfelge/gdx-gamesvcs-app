@@ -12,6 +12,7 @@ public class HtmlLauncher extends GwtApplication {
 
     public static final String NG_APP_ID = "46188:ARRyvuAv";
     public static final Integer NG_BOARD1_ID = 7684;
+    public static final Integer NG_ACH1_ID = 52180;
     //http://www.newgrounds.com/projects/games/1110754/preview
 
     @Override
@@ -36,6 +37,17 @@ public class HtmlLauncher extends GwtApplication {
 
                         if (independantId != null && independantId.equals(GdxGameSvcsApp.LEADERBOARD1))
                             retVal = NG_BOARD1_ID;
+
+                        return retVal;
+                    }
+                })
+                .setNgMedalMapper(new IGameServiceIdMapper<Integer>() {
+                    @Override
+                    public Integer mapToGsId(String independantId) {
+                        Integer retVal = null;
+
+                        if (independantId != null && independantId.equals(GdxGameSvcsApp.ACHIEVEMENT1))
+                            retVal = NG_ACH1_ID;
 
                         return retVal;
                     }

@@ -24,6 +24,7 @@ import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
 public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceListener {
     public static final String LEADERBOARD1 = "BOARD1";
+    public static final String ACHIEVEMENT1 = "ACH1";
     public IGameServiceClient gsClient;
     Skin skin;
     Stage stage;
@@ -105,7 +106,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         unlockAchievement.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                gsClient.unlockAchievement("ACH1");
+                gsClient.unlockAchievement(ACHIEVEMENT1);
             }
         });
 
@@ -144,7 +145,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
         table.row();
         table.add(new Label("Achievements:", skin)).right();
-        table.add(new Label("ACH1-ACH3", skin)).left();
+        table.add(new Label(ACHIEVEMENT1, skin)).left();
 
         Table achievementsButtons = new Table();
         achievementsButtons.defaults().uniform().pad(5);
