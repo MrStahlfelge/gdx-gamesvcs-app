@@ -12,7 +12,7 @@ public class HtmlLauncher extends GwtApplication {
 
     public static final String NG_APP_ID = "46188:ARRyvuAv";
     public static final Integer NG_BOARD1_ID = 7684;
-    public static final Integer NG_ACH1_ID = 52180;
+    public static final Integer NG_ACH1_ID = 52181;
     //http://www.newgrounds.com/projects/games/1110754/preview
 
     @Override
@@ -51,7 +51,8 @@ public class HtmlLauncher extends GwtApplication {
 
                         return retVal;
                     }
-                });
+                })
+                .setEventHostId("newgrounds.com");
 
         gdxGameSvcsApp.gsClient = gsClient;
 
