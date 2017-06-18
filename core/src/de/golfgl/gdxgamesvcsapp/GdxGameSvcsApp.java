@@ -25,6 +25,8 @@ import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceListener {
     public static final String LEADERBOARD1 = "BOARD1";
     public static final String ACHIEVEMENT1 = "ACH1";
+    public static final String EVENT1 = "EVENT1";
+
     public IGameServiceClient gsClient;
     Skin skin;
     Stage stage;
@@ -110,6 +112,14 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
             }
         });
 
+        TextButton submitEvent1Btn = new TextButton("submit", skin);
+        submitEvent1Btn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gsClient.submitEvent(EVENT1, 1);
+            }
+        });
+
         // Create a table that fills the screen. Everything else will go inside this table.
         Table table = new Table();
         table.setFillParent(true);
@@ -152,6 +162,11 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         achievementsButtons.add(showAchievements);
         achievementsButtons.add(unlockAchievement);
         table.add(achievementsButtons);
+
+        table.row();
+        table.add(new Label("Events:", skin)).right();
+        table.add(new Label(EVENT1, skin));
+        table.add(submitEvent1Btn);
 
     }
 
