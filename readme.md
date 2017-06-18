@@ -1,6 +1,8 @@
 # gdx-gamesvcs
 
-Test and demo app for gdx-gamesvcs https://github.com/MrStahlfelge/gdx-gamesvcs-app
+Test and demo app for gdx-gamesvcs https://github.com/MrStahlfelge/gdx-gamesvcs
+
+See the documentation at the main project for more information.
 
 ## Updates & News
 Follow me to receive release updates about this
