@@ -4,13 +4,14 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 
+import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 import de.golfgl.gdxgamesvcs.NgioClient;
 import de.golfgl.gdxgamesvcsapp.GdxGameSvcsApp;
 
 public class HtmlLauncher extends GwtApplication {
 
     public static final String NG_APP_ID = "46188:ARRyvuAv";
-    public static final String NGIO_SESSIONID_PARAM = "ngio_session_id";
+    public static final Integer NG_BOARD1_ID = 7684;
     //http://www.newgrounds.com/projects/games/1110754/preview
 
     @Override
@@ -26,8 +27,19 @@ public class HtmlLauncher extends GwtApplication {
         NgioClient gsClient = new NgioClient();
 
         gsClient.initialize(NG_APP_ID,
-                com.google.gwt.user.client.Window.Location.getParameter(NGIO_SESSIONID_PARAM),
-                null);
+                com.google.gwt.user.client.Window.Location.getParameter(NgioClient.NGIO_SESSIONID_PARAM),
+                null)
+                .setNgScoreboardMapper(new IGameServiceIdMapper<Integer>() {
+                    @Override
+                    public Integer mapToGsId(String independantId) {
+                        Integer retVal = null;
+
+                        if (independantId != null && independantId.equals(GdxGameSvcsApp.LEADERBOARD1))
+                            retVal = NG_BOARD1_ID;
+
+                        return retVal;
+                    }
+                });
 
         gdxGameSvcsApp.gsClient = gsClient;
 

@@ -23,6 +23,7 @@ import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
 public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceListener {
+    public static final String LEADERBOARD1 = "BOARD1";
     public IGameServiceClient gsClient;
     Skin skin;
     Stage stage;
@@ -80,7 +81,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 try {
-                    gsClient.submitToLeaderboard("BOARD1", 100, gsClient.getGameServiceId());
+                    gsClient.submitToLeaderboard(LEADERBOARD1, 100, gsClient.getGameServiceId());
                 } catch (GameServiceException e) {
                     e.printStackTrace();
                 }
@@ -133,7 +134,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
         table.row();
         table.add(new Label("Leaderboard:", skin)).right();
-        table.add(new Label("BOARD1", skin)).left();
+        table.add(new Label(LEADERBOARD1, skin)).left();
 
         Table leaderBoardButtons = new Table();
         leaderBoardButtons.defaults().uniform().pad(5);
