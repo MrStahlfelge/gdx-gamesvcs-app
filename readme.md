@@ -1,8 +1,14 @@
-# gdx-gamesvcs
+# gdx-gamesvcs-app
 
 Test and demo app for gdx-gamesvcs https://github.com/MrStahlfelge/gdx-gamesvcs
 
-See the documentation at the main project for more information.
+See the documentation and wiki at the main project for more information.
+
+## Master branch
+
+This is the master branch. See the branches for examples for the supported 
+Game Service API clients and compare them against this branch to see what is 
+added to embed a certain service.
 
 ## Updates & News
 Follow me to receive release updates about this
