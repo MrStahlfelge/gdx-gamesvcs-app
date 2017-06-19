@@ -2,13 +2,23 @@
 
 Test and demo app for gdx-gamesvcs https://github.com/MrStahlfelge/gdx-gamesvcs
 
+## Newgrounds branch
+
+This is the Newgrounds example branch. See the other branches for examples for 
+the supported Game Service API clients and compare them against master to see 
+what is added to embed a certain service.
+
+## Documentation
 See the documentation and wiki at the main project for more information.
 
-## Master branch
+You will find information to the Newgrounds API at
+https://github.com/MrStahlfelge/gdx-gamesvcs/wiki/Newgrounds
 
-This is the master branch. See the branches for examples for the supported 
-Game Service API clients and compare them against this branch to see what is 
-added to embed a certain service.
+## Working demo
+A compiled version of this branch can be seen at Newgrounds, of course:
+
+http://www.newgrounds.com/projects/games/1110754/preview
+
 
 ## Updates & News
 Follow me to receive release updates about this
