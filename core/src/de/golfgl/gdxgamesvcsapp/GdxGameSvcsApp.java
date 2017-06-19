@@ -174,7 +174,9 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         if (gsClient.isConnected())
             gsClient.logOff();
         else {
-            gsClient.connect(false);
+            if (!gsClient.connect(false))
+                Gdx.app.error("GS_ERROR", "Cannot sign in: No credentials or session id given.");
+
             refreshStatusLabel();
         }
     }
@@ -282,7 +284,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     }
 
     @Override
-    public void gsErrorMsg(String msg) {
+    public void gsErrorMsg(GsErrorType et, String msg) {
         Gdx.app.error("GS_ERROR", msg);
     }
 
