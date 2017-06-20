@@ -83,11 +83,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         submitToLeaderboard.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                try {
-                    gsClient.submitToLeaderboard(LEADERBOARD1, 100, gsClient.getGameServiceId());
-                } catch (GameServiceException e) {
-                    e.printStackTrace();
-                }
+                gsClient.submitToLeaderboard(LEADERBOARD1, 100, gsClient.getGameServiceId());
             }
         });
 
