@@ -89,6 +89,7 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html:$gamsvcsVersion"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion:sources"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion:sources"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html:$gamsvcsVersion:sources"
     }
 }
@@ -100,6 +101,7 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion"
     }
 }
 

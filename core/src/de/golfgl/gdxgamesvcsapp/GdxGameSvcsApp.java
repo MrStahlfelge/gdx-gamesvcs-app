@@ -17,8 +17,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import de.golfgl.gdxgamesvcs.GameJoltClient;
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
+import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
@@ -26,6 +28,9 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     public static final String LEADERBOARD1 = "BOARD1";
     public static final String ACHIEVEMENT1 = "ACH1";
     public static final String EVENT1 = "EVENT1";
+
+    public static final String GAMEJOLT_APP_ID = "263351";
+    public static final String GAMEJOLT_PRIVATE_KEY = "your_secret_key_here";
 
     public IGameServiceClient gsClient;
     Skin skin;
@@ -44,6 +49,33 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
         if (gsClient == null)
             gsClient = new NoGameServiceClient();
+
+        // code for all platforms for GameJolt done here to keep it simple
+        // in real projects, I prefer to use some helper classes
+        if (gsClient instanceof GameJoltClient) {
+            ((GameJoltClient) gsClient).setGjScoreTableMapper(new IGameServiceIdMapper<Integer>() {
+                @Override
+                public Integer mapToGsId(String independantId) {
+                    Integer retVal = null;
+
+                    if (independantId != null && independantId.equals(GdxGameSvcsApp.LEADERBOARD1))
+                        retVal = 267766;
+
+                    return retVal;
+                }
+            })
+                    .setGjTrophyMapper(new IGameServiceIdMapper<Integer>() {
+                        @Override
+                        public Integer mapToGsId(String independantId) {
+                            Integer retVal = null;
+
+                            if (independantId != null && independantId.equals(GdxGameSvcsApp.ACHIEVEMENT1))
+                                retVal = 78858;
+
+                            return retVal;
+                        }
+                    });
+        }
 
         gsClient.setListener(this);
 
