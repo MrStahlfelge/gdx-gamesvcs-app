@@ -74,7 +74,12 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
                             return retVal;
                         }
-                    });
+                    })
+            .setEventKeyPrefix("EVENT_")
+            .setGuestName("Guest");
+
+            //use this for first time initialization of event keys
+            //.initializeOrResetEventKey(EVENT1);
         }
 
         gsClient.setListener(this);
