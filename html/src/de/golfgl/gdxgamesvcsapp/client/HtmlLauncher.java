@@ -52,7 +52,7 @@ public class HtmlLauncher extends GwtApplication {
                         return retVal;
                     }
                 })
-                .setEventHostId("newgrounds.com");
+                .setEventHostId(com.google.gwt.user.client.Window.Location.getHostName());
 
         gdxGameSvcsApp.gsClient = gsClient;
 
