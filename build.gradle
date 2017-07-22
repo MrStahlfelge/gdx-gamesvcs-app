@@ -19,6 +19,11 @@ allprojects {
 
     version = '1.0'
     ext {
+        minSdk = 15
+        targetSdk = 25
+        compileSdk = 25
+        buildTools = '25.0.2'
+
         appName = "gdx-gamesvcs-app"
         gdxVersion = '1.9.6'
         roboVMVersion = '2.3.0'
@@ -58,7 +63,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android:$gamsvcsVersion"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-amazongc:$gamsvcsVersion"
     }
 }
 

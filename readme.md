@@ -2,13 +2,20 @@
 
 Test and demo app for gdx-gamesvcs https://github.com/MrStahlfelge/gdx-gamesvcs
 
+## Amazon GameCircle branch
+
+This is the Amazon GameCircle example branch. See the other branches for examples for 
+the supported Game Service API clients and compare them against master to see 
+what is added to embed a certain service.
+
+## Documentation
 See the documentation and wiki at the main project for more information.
 
-## Master branch
+You will find information to the Amazon GC implementation at
+https://github.com/MrStahlfelge/gdx-gamesvcs/wiki/Amazon-GameCircle
 
-This is the master branch. See the branches for examples for the supported 
-Game Service API clients and compare them against this branch to see what is 
-added to embed a certain service.
+## Working demo
+A compiled version of this branch is not published due to restrictions for beta test users.
 
 ## Updates & News
 Follow me to receive release updates about this

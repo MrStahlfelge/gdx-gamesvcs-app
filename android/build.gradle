@@ -1,6 +1,6 @@
 android {
-    buildToolsVersion "25.0.2"
-    compileSdkVersion 25
+    compileSdkVersion compileSdk
+    buildToolsVersion "${buildTools}"
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -19,8 +19,8 @@ android {
     }
     defaultConfig {
         applicationId "de.golfgl.gdxgamesvcsapp"
-        minSdkVersion 15
-        targetSdkVersion 25
+        minSdkVersion minSdk
+        targetSdkVersion targetSdk
     }
 }
 
