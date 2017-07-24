@@ -23,8 +23,7 @@ public class AndroidLauncher extends AndroidApplication {
                 return false;
             }
         };
-        gameCircleClient.intialize(this).setAchievementsEnabled(true)
-                .setLeaderboardsEnabled(true);
+        gameCircleClient.setAchievementsEnabled(true).setLeaderboardsEnabled(true).intialize(this);
         game.gsClient = gameCircleClient;
         initialize(game, config);
     }
