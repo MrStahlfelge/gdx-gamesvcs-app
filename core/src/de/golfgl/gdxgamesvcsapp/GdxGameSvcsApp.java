@@ -2,19 +2,19 @@ package de.golfgl.gdxgamesvcsapp;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import de.golfgl.gdxgamesvcs.GameJoltClient;
@@ -23,6 +23,8 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
+import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
+import de.golfgl.gdxgamesvcs.leaderboard.LeaderBoardEntry;
 
 public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceListener {
     public static final String LEADERBOARD1 = "BOARD1";
@@ -39,6 +41,8 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     Label gsStatus;
     Label gsUsername;
     private TextButton signInButton;
+    private TextureAtlas atlas;
+    private TextField scoreFillin;
 
     @Override
     public void create() {
@@ -95,6 +99,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     private void prepareUI() {
         gsStatus = new Label("", skin);
         gsUsername = new Label("", skin);
+        scoreFillin = new TextField("100", skin);
 
         signInButton = new TextButton("", skin);
         signInButton.addListener(new ChangeListener() {
@@ -114,18 +119,50 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
                 }
             }
         });
-        showLeaderBoards.setDisabled(!gsClient.providesLeaderboardUI());
+        showLeaderBoards.setVisible(
+                gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.ShowAllLeaderboardsUI));
+
+        TextButton fetchLeaderboards = new TextButton("Fetch", skin);
+        fetchLeaderboards.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gsClient.fetchLeaderboardEntries(LEADERBOARD1, 8, false,
+                        new IFetchLeaderBoardEntriesResponseListener() {
+                            @Override
+                            public void onLeaderBoardResponse(final Array<LeaderBoardEntry> leaderBoard) {
+                                if (leaderBoard != null)
+                                    Gdx.app.postRunnable(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showLeaderBoardEntries(leaderBoard);
+                                        }
+                                    });
+                            }
+                        });
+            }
+        });
+        fetchLeaderboards.setVisible(
+                gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.FetchLeaderBoardEntries));
 
         TextButton submitToLeaderboard = new TextButton("Submit", skin);
         submitToLeaderboard.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                gsClient.submitToLeaderboard(LEADERBOARD1, 100, gsClient.getGameServiceId());
+                int score;
+                try {
+                    score = Integer.valueOf(scoreFillin.getText());
+                } catch (NumberFormatException nfe) {
+                    score = 0;
+                }
+
+                if (score > 0)
+                    gsClient.submitToLeaderboard(LEADERBOARD1, score, gsClient.getGameServiceId());
             }
         });
 
         TextButton showAchievements = new TextButton("Show", skin);
-        showAchievements.setDisabled(!gsClient.providesAchievementsUI());
+        showAchievements.setVisible(
+                gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.ShowAchievementsUI));
         showAchievements.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -176,17 +213,22 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         table.add(gsUsername).left();
         table.add();
 
-        table.row();
+        table.row().padTop(10);
         table.add(new Label("Leaderboard:", skin)).right();
         table.add(new Label(LEADERBOARD1, skin)).left();
 
         Table leaderBoardButtons = new Table();
         leaderBoardButtons.defaults().uniform().pad(5);
         leaderBoardButtons.add(showLeaderBoards);
-        leaderBoardButtons.add(submitToLeaderboard);
+        leaderBoardButtons.add(fetchLeaderboards);
         table.add(leaderBoardButtons);
 
         table.row();
+        table.add();
+        table.add(scoreFillin);
+        table.add(submitToLeaderboard);
+
+        table.row().padTop(10);
         table.add(new Label("Achievements:", skin)).right();
         table.add(new Label(ACHIEVEMENT1, skin)).left();
 
@@ -201,6 +243,31 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         table.add(new Label(EVENT1, skin));
         table.add(submitEvent1Btn);
 
+    }
+
+    private void showLeaderBoardEntries(Array<LeaderBoardEntry> leaderBoard) {
+        Dialog dialog = new Dialog("Leaderboard", skin);
+
+        if (leaderBoard.size > 0) {
+            Table resultTable = new Table();
+            resultTable.defaults().pad(3, 5, 3, 5);
+
+            for (int i = 0; i < leaderBoard.size; i++) {
+                LeaderBoardEntry le = leaderBoard.get(i);
+                resultTable.row();
+                //resultTable.add(new Label(le.getScoreRank(), skin));
+                resultTable.add(new Label(le.getUserDisplayName(), skin));
+                resultTable.add(new Label(le.getFormattedValue(), skin));
+                resultTable.add(new Label(le.getScoreTag(), skin));
+            }
+
+            dialog.getContentTable().add(resultTable);
+        } else
+            dialog.add(new Label("No leaderboard entries", skin));
+
+        dialog.button("OK");
+
+        dialog.show(stage);
     }
 
     private void gsSignInOrOut() {
@@ -238,29 +305,10 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         // strongly
         // recommended solely for the convenience of getting a texture, region, etc as a drawable, tinted drawable, etc.
         skin = new Skin();
+        atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
+        skin.addRegions(atlas);
+        skin.load(Gdx.files.internal("skin/uiskin.json"));
 
-        // Generate a 1x1 white texture and store it in the skin named "white".
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        skin.add("white", new Texture(pixmap));
-
-        // Store the default libgdx font under the name "default".
-        skin.add("default", new BitmapFont());
-
-        // Configure a TextButtonStyle and name it "default". Skin resources are stored by type, so this doesn't
-        // overwrite the font.
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.checked = skin.newDrawable("white", Color.BLUE);
-        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-        textButtonStyle.font = skin.getFont("default");
-        skin.add("default", textButtonStyle);
-
-        Label.LabelStyle lblStyle = new Label.LabelStyle();
-        lblStyle.font = skin.getFont("default");
-        skin.add("default", lblStyle);
     }
 
     @Override
@@ -280,6 +328,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        atlas.dispose();
     }
 
     @Override
@@ -317,12 +366,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     }
 
     @Override
-    public void gsErrorMsg(GsErrorType et, String msg) {
+    public void gsErrorMsg(GsErrorType et, String msg, Throwable t) {
         Gdx.app.error("GS_ERROR", msg);
-    }
-
-    @Override
-    public void gsGameStateLoaded(byte[] gameState) {
-
     }
 }
