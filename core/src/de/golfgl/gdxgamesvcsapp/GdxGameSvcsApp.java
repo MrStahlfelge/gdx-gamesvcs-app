@@ -41,7 +41,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
     @Override
     public void create() {
-        stage = new Stage(new ExtendViewport(480, 320));
+        stage = new Stage(new ExtendViewport(800, 600));
         Gdx.input.setInputProcessor(stage);
 
         prepareSkin();
@@ -218,7 +218,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
             for (int i = 0; i < leaderBoard.size; i++) {
                 LeaderBoardEntry le = leaderBoard.get(i);
                 resultTable.row();
-                //resultTable.add(new Label(le.getScoreRank(), skin));
+                resultTable.add(new Label(le.getScoreRank(), skin));
                 resultTable.add(new Label(le.getUserDisplayName(), skin));
                 resultTable.add(new Label(le.getFormattedValue(), skin));
                 resultTable.add(new Label(le.getScoreTag(), skin));
