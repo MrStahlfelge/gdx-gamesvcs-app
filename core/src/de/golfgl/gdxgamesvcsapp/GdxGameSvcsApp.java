@@ -2,11 +2,7 @@ package de.golfgl.gdxgamesvcsapp;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -15,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
@@ -36,6 +33,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     Label gsUsername;
     private TextButton signInButton;
     private TextureAtlas atlas;
+    private TextField scoreFillin;
 
     @Override
     public void create() {
@@ -60,6 +58,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     private void prepareUI() {
         gsStatus = new Label("", skin);
         gsUsername = new Label("", skin);
+        scoreFillin = new TextField("100", skin);
 
         signInButton = new TextButton("", skin);
         signInButton.addListener(new ChangeListener() {
@@ -85,7 +84,15 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         submitToLeaderboard.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                gsClient.submitToLeaderboard(LEADERBOARD1, 100, gsClient.getGameServiceId());
+                int score;
+                try {
+                    score = Integer.valueOf(scoreFillin.getText());
+                } catch (NumberFormatException nfe) {
+                    score = 0;
+                }
+
+                if (score > 0)
+                    gsClient.submitToLeaderboard(LEADERBOARD1, score, gsClient.getGameServiceId());
             }
         });
 
@@ -141,17 +148,22 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         table.add(gsUsername).left();
         table.add();
 
-        table.row();
+        table.row().padTop(10);
         table.add(new Label("Leaderboard:", skin)).right();
         table.add(new Label(LEADERBOARD1, skin)).left();
 
         Table leaderBoardButtons = new Table();
         leaderBoardButtons.defaults().uniform().pad(5);
         leaderBoardButtons.add(showLeaderBoards);
-        leaderBoardButtons.add(submitToLeaderboard);
+        //leaderBoardButtons.add(submitToLeaderboard);
         table.add(leaderBoardButtons);
 
         table.row();
+        table.add();
+        table.add(scoreFillin);
+        table.add(submitToLeaderboard);
+
+        table.row().padTop(10);
         table.add(new Label("Achievements:", skin)).right();
         table.add(new Label(ACHIEVEMENT1, skin)).left();
 
