@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -34,6 +35,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     Label gsStatus;
     Label gsUsername;
     private TextButton signInButton;
+    private TextureAtlas atlas;
 
     @Override
     public void create() {
@@ -201,29 +203,10 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         // strongly
         // recommended solely for the convenience of getting a texture, region, etc as a drawable, tinted drawable, etc.
         skin = new Skin();
+        atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
+        skin.addRegions(atlas);
+        skin.load(Gdx.files.internal("skin/uiskin.json"));
 
-        // Generate a 1x1 white texture and store it in the skin named "white".
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        skin.add("white", new Texture(pixmap));
-
-        // Store the default libgdx font under the name "default".
-        skin.add("default", new BitmapFont());
-
-        // Configure a TextButtonStyle and name it "default". Skin resources are stored by type, so this doesn't
-        // overwrite the font.
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.checked = skin.newDrawable("white", Color.BLUE);
-        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-        textButtonStyle.font = skin.getFont("default");
-        skin.add("default", textButtonStyle);
-
-        Label.LabelStyle lblStyle = new Label.LabelStyle();
-        lblStyle.font = skin.getFont("default");
-        skin.add("default", lblStyle);
     }
 
     @Override
@@ -243,6 +226,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        atlas.dispose();
     }
 
     @Override
