@@ -7,18 +7,22 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
+import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
+import de.golfgl.gdxgamesvcs.leaderboard.LeaderBoardEntry;
 
 public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceListener {
     public static final String LEADERBOARD1 = "BOARD1";
@@ -78,7 +82,30 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
                 }
             }
         });
-        showLeaderBoards.setDisabled(!gsClient.providesLeaderboardUI());
+        showLeaderBoards.setVisible(
+                gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.ShowAllLeaderboardsUI));
+
+        TextButton fetchLeaderboards = new TextButton("Fetch", skin);
+        fetchLeaderboards.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gsClient.fetchLeaderboardEntries(LEADERBOARD1, 8, false,
+                        new IFetchLeaderBoardEntriesResponseListener() {
+                            @Override
+                            public void onLeaderBoardResponse(final Array<LeaderBoardEntry> leaderBoard) {
+                                if (leaderBoard != null)
+                                    Gdx.app.postRunnable(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showLeaderBoardEntries(leaderBoard);
+                                        }
+                                    });
+                            }
+                        });
+            }
+        });
+        fetchLeaderboards.setVisible(
+                gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.FetchLeaderBoardEntries));
 
         TextButton submitToLeaderboard = new TextButton("Submit", skin);
         submitToLeaderboard.addListener(new ChangeListener() {
@@ -97,7 +124,8 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         });
 
         TextButton showAchievements = new TextButton("Show", skin);
-        showAchievements.setDisabled(!gsClient.providesAchievementsUI());
+        showAchievements.setVisible(
+                gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.ShowAchievementsUI));
         showAchievements.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -155,7 +183,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         Table leaderBoardButtons = new Table();
         leaderBoardButtons.defaults().uniform().pad(5);
         leaderBoardButtons.add(showLeaderBoards);
-        //leaderBoardButtons.add(submitToLeaderboard);
+        leaderBoardButtons.add(fetchLeaderboards);
         table.add(leaderBoardButtons);
 
         table.row();
@@ -178,6 +206,31 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         table.add(new Label(EVENT1, skin));
         table.add(submitEvent1Btn);
 
+    }
+
+    private void showLeaderBoardEntries(Array<LeaderBoardEntry> leaderBoard) {
+        Dialog dialog = new Dialog("Leaderboard", skin);
+
+        if (leaderBoard.size > 0) {
+            Table resultTable = new Table();
+            resultTable.defaults().pad(3, 5, 3, 5);
+
+            for (int i = 0; i < leaderBoard.size; i++) {
+                LeaderBoardEntry le = leaderBoard.get(i);
+                resultTable.row();
+                //resultTable.add(new Label(le.getScoreRank(), skin));
+                resultTable.add(new Label(le.getUserDisplayName(), skin));
+                resultTable.add(new Label(le.getFormattedValue(), skin));
+                resultTable.add(new Label(le.getScoreTag(), skin));
+            }
+
+            dialog.getContentTable().add(resultTable);
+        } else
+            dialog.add(new Label("No leaderboard entries", skin));
+
+        dialog.button("OK");
+
+        dialog.show(stage);
     }
 
     private void gsSignInOrOut() {
@@ -276,12 +329,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     }
 
     @Override
-    public void gsErrorMsg(GsErrorType et, String msg) {
+    public void gsErrorMsg(GsErrorType et, String msg, Throwable t) {
         Gdx.app.error("GS_ERROR", msg);
-    }
-
-    @Override
-    public void gsGameStateLoaded(byte[] gameState) {
-
     }
 }
