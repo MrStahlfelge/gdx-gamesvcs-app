@@ -22,7 +22,7 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
-import de.golfgl.gdxgamesvcs.leaderboard.LeaderBoardEntry;
+import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 
 public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceListener {
     public static final String LEADERBOARD1 = "BOARD1";
@@ -92,7 +92,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
                 gsClient.fetchLeaderboardEntries(LEADERBOARD1, 8, false,
                         new IFetchLeaderBoardEntriesResponseListener() {
                             @Override
-                            public void onLeaderBoardResponse(final Array<LeaderBoardEntry> leaderBoard) {
+                            public void onLeaderBoardResponse(final Array<ILeaderBoardEntry> leaderBoard) {
                                 if (leaderBoard != null)
                                     Gdx.app.postRunnable(new Runnable() {
                                         @Override
@@ -208,7 +208,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
     }
 
-    private void showLeaderBoardEntries(Array<LeaderBoardEntry> leaderBoard) {
+    private void showLeaderBoardEntries(Array<ILeaderBoardEntry> leaderBoard) {
         Dialog dialog = new Dialog("Leaderboard", skin);
 
         if (leaderBoard.size > 0) {
@@ -216,10 +216,17 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
             resultTable.defaults().pad(3, 5, 3, 5);
 
             for (int i = 0; i < leaderBoard.size; i++) {
-                LeaderBoardEntry le = leaderBoard.get(i);
+                ILeaderBoardEntry le = leaderBoard.get(i);
                 resultTable.row();
                 resultTable.add(new Label(le.getScoreRank(), skin));
-                resultTable.add(new Label(le.getUserDisplayName(), skin));
+
+                String userDisplayName = le.getUserDisplayName();
+                if (le.getUserId() == null)
+                    userDisplayName = "(" + userDisplayName + ")";
+                else if (le.isCurrentPlayer())
+                    userDisplayName = "*" + userDisplayName;
+                resultTable.add(new Label(userDisplayName, skin));
+
                 resultTable.add(new Label(le.getFormattedValue(), skin));
                 resultTable.add(new Label(le.getScoreTag(), skin));
             }
