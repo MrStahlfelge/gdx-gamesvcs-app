@@ -30,8 +30,8 @@ public class AndroidLauncher extends AndroidApplication {
             }
 
             @Override
-            public boolean incrementAchievement(String achievementId, int incNum) {
-                return super.incrementAchievement(GpgsMappers.mapToGpgsAchievement(achievementId), incNum);
+            public boolean incrementAchievement(String achievementId, int incNum, final float f) {
+                return super.incrementAchievement(GpgsMappers.mapToGpgsAchievement(achievementId), incNum, f);
             }
 
             @Override
