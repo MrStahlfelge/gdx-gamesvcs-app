@@ -3,6 +3,8 @@ package de.golfgl.gdxgamesvcsapp.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
+
+import de.golfgl.gdxgamesvcs.KongClient;
 import de.golfgl.gdxgamesvcsapp.GdxGameSvcsApp;
 
 public class HtmlLauncher extends GwtApplication {
@@ -16,6 +18,8 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new GdxGameSvcsApp();
+                GdxGameSvcsApp gdxGameSvcsApp = new GdxGameSvcsApp();
+                gdxGameSvcsApp.gsClient = new KongClient();
+                return gdxGameSvcsApp;
         }
 }
