@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -22,9 +23,11 @@ import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
-import de.golfgl.gdxgamesvcs.NoGameServiceClient;
+import de.golfgl.gdxgamesvcs.MockGameServiceClient;
+import de.golfgl.gdxgamesvcs.achievement.IAchievement;
+import de.golfgl.gdxgamesvcs.achievement.IFetchAchievementsResponseListener;
 import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
-import de.golfgl.gdxgamesvcs.leaderboard.LeaderBoardEntry;
+import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 
 public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceListener {
     public static final String LEADERBOARD1 = "BOARD1";
@@ -52,7 +55,32 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         prepareSkin();
 
         if (gsClient == null)
-            gsClient = new NoGameServiceClient();
+            gsClient = new MockGameServiceClient(1) {
+                @Override
+                protected Array<ILeaderBoardEntry> getLeaderboardEntries() {
+                    return null;
+                }
+
+                @Override
+                protected Array<String> getGameStates() {
+                    return null;
+                }
+
+                @Override
+                protected byte[] getGameState() {
+                    return new byte[0];
+                }
+
+                @Override
+                protected Array<IAchievement> getAchievements() {
+                    return null;
+                }
+
+                @Override
+                protected String getPlayerName() {
+                    return null;
+                }
+            };
 
         // code for all platforms for GameJolt done here to keep it simple
         // in real projects, I prefer to use some helper classes
@@ -126,19 +154,22 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         fetchLeaderboards.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                gsClient.fetchLeaderboardEntries(LEADERBOARD1, 8, false,
+                final MyDialog dialog = new MyDialog("Leaderboard");
+                boolean fetchingNow = gsClient.fetchLeaderboardEntries(LEADERBOARD1, 8, false,
                         new IFetchLeaderBoardEntriesResponseListener() {
                             @Override
-                            public void onLeaderBoardResponse(final Array<LeaderBoardEntry> leaderBoard) {
-                                if (leaderBoard != null)
-                                    Gdx.app.postRunnable(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showLeaderBoardEntries(leaderBoard);
-                                        }
-                                    });
+                            public void onLeaderBoardResponse(final Array<ILeaderBoardEntry> leaderBoard) {
+                                Gdx.app.postRunnable(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showLeaderBoardEntries(dialog, leaderBoard);
+                                    }
+                                });
                             }
                         });
+
+                dialog.text(fetchingNow ? "Fetching..." : "Could not fetch");
+                dialog.show(stage);
             }
         });
         fetchLeaderboards.setVisible(
@@ -171,6 +202,31 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
                 } catch (GameServiceException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        TextButton fetchAchievements = new TextButton("Fetch", skin);
+        fetchAchievements.setVisible(
+                gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.FetchAchievements));
+        fetchAchievements.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                final MyDialog dialog = new MyDialog("Achievements");
+                boolean fetchingNow = gsClient.fetchAchievements(new IFetchAchievementsResponseListener() {
+                    @Override
+                    public void onFetchAchievementsResponse(final Array<IAchievement> achievements) {
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                showAchievementsList(dialog, achievements);
+                            }
+                        });
+
+                    }
+                });
+
+                dialog.text(fetchingNow ? "Fetching..." : "Could not fetch");
+                dialog.show(stage);
             }
         });
 
@@ -235,6 +291,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         Table achievementsButtons = new Table();
         achievementsButtons.defaults().uniform().pad(5);
         achievementsButtons.add(showAchievements);
+        achievementsButtons.add(fetchAchievements);
         achievementsButtons.add(unlockAchievement);
         table.add(achievementsButtons);
 
@@ -245,29 +302,60 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
     }
 
-    private void showLeaderBoardEntries(Array<LeaderBoardEntry> leaderBoard) {
-        Dialog dialog = new Dialog("Leaderboard", skin);
+    private void showAchievementsList(MyDialog dialog, Array<IAchievement> achievements) {
+        dialog.getContentTable().clear();
 
-        if (leaderBoard.size > 0) {
+        if (achievements == null) {
+            dialog.text("Could not fetch achievements");
+        } else if (achievements.size > 0) {
+            Table resultTable = new Table();
+            resultTable.defaults().pad(3, 5, 3, 5);
+
+            for (int i = 0; i < achievements.size; i++) {
+                IAchievement ach = achievements.get(i);
+                resultTable.row();
+                resultTable.add(new Label(ach.getTitle(), skin));
+                resultTable.add(new Label(ach.isUnlocked() ? "unlocked" : "locked", skin));
+                resultTable.add(new Label(Integer.toString((int) (ach.getCompletionPercentage() * 100)) + "%", skin));
+            }
+
+            dialog.getContentTable().add(resultTable);
+        } else
+            dialog.text("No achievements");
+
+        dialog.reshow();
+    }
+
+    private void showLeaderBoardEntries(MyDialog dialog, Array<ILeaderBoardEntry> leaderBoard) {
+        dialog.getContentTable().clear();
+
+        if (leaderBoard == null) {
+            dialog.text("Could not fetch leaderboard");
+        } else if (leaderBoard.size > 0) {
             Table resultTable = new Table();
             resultTable.defaults().pad(3, 5, 3, 5);
 
             for (int i = 0; i < leaderBoard.size; i++) {
-                LeaderBoardEntry le = leaderBoard.get(i);
+                ILeaderBoardEntry le = leaderBoard.get(i);
                 resultTable.row();
                 resultTable.add(new Label(le.getScoreRank(), skin));
-                resultTable.add(new Label(le.getUserDisplayName(), skin));
+
+                String userDisplayName = le.getUserDisplayName();
+                if (le.getUserId() == null)
+                    userDisplayName = "(" + userDisplayName + ")";
+                else if (le.isCurrentPlayer())
+                    userDisplayName = "*" + userDisplayName;
+                resultTable.add(new Label(userDisplayName, skin));
+
                 resultTable.add(new Label(le.getFormattedValue(), skin));
                 resultTable.add(new Label(le.getScoreTag(), skin));
             }
 
             dialog.getContentTable().add(resultTable);
         } else
-            dialog.add(new Label("No leaderboard entries", skin));
+            dialog.text("No leaderboard entries");
 
-        dialog.button("OK");
-
-        dialog.show(stage);
+        dialog.reshow();
     }
 
     private void gsSignInOrOut() {
@@ -286,11 +374,11 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         String newUserText;
 
         if (gsClient.isConnected())
-            newStatusText = "CONNECTED";
+            newStatusText = "SESSION ACTIVE";
         else if (gsClient.isConnectionPending())
-            newStatusText = "CONNECTING...";
+            newStatusText = "CONNECTING SESSION...";
         else
-            newStatusText = "NO CONNECTION";
+            newStatusText = "NO SESSION";
 
         gsStatus.setText(newStatusText);
 
@@ -367,6 +455,21 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
     @Override
     public void gsErrorMsg(GsErrorType et, String msg, Throwable t) {
-        Gdx.app.error("GS_ERROR", msg);
+        Dialog dialog = new MyDialog("Error");
+        dialog.text(et.toString() + ": " + msg);
+        dialog.show(stage);
+    }
+
+    public class MyDialog extends Dialog {
+        public MyDialog(String title) {
+            super(title, skin);
+            super.button("OK");
+        }
+
+        public void reshow() {
+            this.show(stage, Actions.alpha(1)).setPosition(Math.round((stage.getWidth() - this.getWidth()) / 2),
+                    Math.round((stage.getHeight() - this.getHeight()) / 2));
+
+        }
     }
 }
