@@ -26,6 +26,8 @@ import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.MockGameServiceClient;
 import de.golfgl.gdxgamesvcs.achievement.IAchievement;
 import de.golfgl.gdxgamesvcs.achievement.IFetchAchievementsResponseListener;
+import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
+import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 
@@ -34,6 +36,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     public static final String ACHIEVEMENT1 = "ACH1";
     public static final String EVENT1 = "EVENT1";
     public static final String REPOLINK = "https://github.com/MrStahlfelge/gdx-gamesvcs";
+    public static final String FILE_ID = "cloud";
 
     public IGameServiceClient gsClient;
     Skin skin;
@@ -44,6 +47,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     private TextButton signInButton;
     private TextureAtlas atlas;
     private TextField scoreFillin;
+    private TextField cloudData;
 
     @Override
     public void create() {
@@ -94,6 +98,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         gsStatus = new Label("", skin);
         gsUsername = new Label("", skin);
         scoreFillin = new TextField("100", skin);
+        cloudData = new TextField("", skin);
 
         Label repoLink = new Label(REPOLINK, skin);
         repoLink.setColor(.3f, .3f, 1f, 1f);
@@ -206,6 +211,35 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
             }
         });
 
+        TextButton loadFromCloud = new TextButton("load", skin);
+        loadFromCloud.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gsClient.loadGameState(FILE_ID, new ILoadGameStateResponseListener() {
+                    @Override
+                    public void gsGameStateLoaded(byte[] gameState) {
+                        cloudData.setText(gameState != null ? new String(gameState) : "failed");
+                    }
+                });
+            }
+        });
+        TextButton saveToCloud = new TextButton("save", skin);
+        saveToCloud.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gsClient.saveGameState(FILE_ID, cloudData.getText().getBytes(), 0,
+                        new ISaveGameStateResponseListener() {
+                            @Override
+                            public void onGameStateSaved(boolean success, String errorCode) {
+                                if (!success) {
+                                    Dialog dialog = new MyDialog("Save");
+                                    dialog.text("Failure: " + errorCode);
+                                }
+                            }
+                        });
+            }
+        });
+
         // Create a table that fills the screen. Everything else will go inside this table.
         Table table = new Table();
         table.setFillParent(true);
@@ -262,6 +296,15 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         table.add(new Label(EVENT1, skin));
         table.add(submitEvent1Btn);
 
+        if (gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.GameStateStorage)) {
+            table.row();
+            table.add(new Label("Cloud storage:", skin)).right();
+            table.add(cloudData);
+            Table storageButtons = new Table();
+            storageButtons.add(saveToCloud);
+            storageButtons.add(loadFromCloud);
+            table.add(storageButtons);
+        }
     }
 
     private void fetchLeaderboard(boolean playerRelated) {
