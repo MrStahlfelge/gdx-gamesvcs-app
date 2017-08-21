@@ -28,6 +28,7 @@ import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.MockGameServiceClient;
 import de.golfgl.gdxgamesvcs.achievement.IAchievement;
 import de.golfgl.gdxgamesvcs.achievement.IFetchAchievementsResponseListener;
+import de.golfgl.gdxgamesvcs.gamestate.IFetchGameStatesListResponseListener;
 import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
 import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
@@ -276,6 +277,48 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
                         });
             }
         });
+        TextButton deleteFromCloud = new TextButton("delete", skin);
+        deleteFromCloud.setVisible(gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.GameStateDelete));
+        deleteFromCloud.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gsClient.deleteGameState(FILE_ID, null);
+            }
+        });
+        TextButton fetchCloudList = new TextButton("list", skin);
+        fetchCloudList.setVisible(gsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.FetchGameStates));
+        fetchCloudList.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                final MyDialog dialog = new MyDialog("Cloud saved states");
+                boolean fetchingNow = gsClient.fetchGameStates(new IFetchGameStatesListResponseListener() {
+                    @Override
+                    public void onFetchGameStatesListResponse(final Array<String> gameStates) {
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.getContentTable().clear();
+                                if (gameStates == null)
+                                    dialog.text("Error fetching game states");
+                                else {
+                                    String allKeys = "";
+                                    for (int i = 0; i < gameStates.size; i++)
+                                        allKeys += gameStates.get(i) + "\n";
+
+                                    if (allKeys.isEmpty())
+                                        allKeys = "(no saved game state)";
+
+                                    dialog.text(allKeys);
+                                }
+                                dialog.reshow();
+                            }
+                        });
+                    }
+                });
+                dialog.text(fetchingNow ? "Fetching..." : "Could not fetch");
+                dialog.show(stage);
+            }
+        });
 
         // Create a table that fills the screen. Everything else will go inside this table.
         Table table = new Table();
@@ -340,6 +383,8 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
             Table storageButtons = new Table();
             storageButtons.add(saveToCloud);
             storageButtons.add(loadFromCloud);
+            storageButtons.add(deleteFromCloud);
+            storageButtons.add(fetchCloudList);
             table.add(storageButtons);
         }
     }
