@@ -89,7 +89,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
         prepareUI();
 
-        gsClient.connect(true);
+        gsClient.resumeSession();
 
         // needed in case the connection is pending
         refreshStatusLabel();
@@ -440,10 +440,10 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     }
 
     private void gsSignInOrOut() {
-        if (gsClient.isConnected())
+        if (gsClient.isSessionActive())
             gsClient.logOff();
         else {
-            if (!gsClient.connect(false))
+            if (!gsClient.logIn())
                 Gdx.app.error("GS_ERROR", "Cannot sign in: No credentials or session id given.");
 
             refreshStatusLabel();
@@ -454,7 +454,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
         String newStatusText;
         String newUserText;
 
-        if (gsClient.isConnected())
+        if (gsClient.isSessionActive())
             newStatusText = "SESSION ACTIVE";
         else if (gsClient.isConnectionPending())
             newStatusText = "CONNECTING SESSION...";
@@ -463,7 +463,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
         gsStatus.setText(newStatusText);
 
-        signInButton.setText(gsClient.isConnected() ? "Sign out" : "Sign in");
+        signInButton.setText(gsClient.isSessionActive() ? "Sign out" : "Sign in");
 
         newUserText = gsClient.getPlayerDisplayName();
         gsUsername.setText(newUserText != null ? newUserText : "(none)");
@@ -504,18 +504,18 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     public void pause() {
         super.pause();
 
-        gsClient.disconnect();
+        gsClient.pauseSession();
     }
 
     @Override
     public void resume() {
         super.resume();
 
-        gsClient.connect(true);
+        gsClient.resumeSession();
     }
 
     @Override
-    public void gsConnected() {
+    public void gsOnSessionActive() {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -525,7 +525,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     }
 
     @Override
-    public void gsDisconnected() {
+    public void gsOnSessionInactive() {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -535,7 +535,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
     }
 
     @Override
-    public void gsErrorMsg(GsErrorType et, String msg, Throwable t) {
+    public void gsShowErrorToUser(GsErrorType et, String msg, Throwable t) {
         Dialog dialog = new MyDialog("Error");
         dialog.text(et.toString() + ": " + msg);
         dialog.show(stage);
