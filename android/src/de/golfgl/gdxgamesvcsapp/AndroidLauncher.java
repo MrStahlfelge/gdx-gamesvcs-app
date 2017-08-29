@@ -6,8 +6,8 @@ import android.os.Bundle;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
-import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.GpgsClient;
+import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 
 public class AndroidLauncher extends AndroidApplication {
     private GpgsClient gpgsClient;
@@ -20,30 +20,20 @@ public class AndroidLauncher extends AndroidApplication {
         GdxGameSvcsApp game = new GdxGameSvcsApp();
         this.gpgsClient = new GpgsClient() {
             @Override
-            public void showLeaderboards(String leaderBoardId) throws GameServiceException {
-                super.showLeaderboards(GpgsMappers.mapToGpgsLeaderboard(leaderBoardId));
-            }
-
-            @Override
-            public boolean submitToLeaderboard(String leaderboardId, long score, String tag) {
-                return super.submitToLeaderboard(GpgsMappers.mapToGpgsLeaderboard(leaderboardId), score, tag);
-            }
-
-            @Override
-            public boolean incrementAchievement(String achievementId, int incNum, final float f) {
-                return super.incrementAchievement(GpgsMappers.mapToGpgsAchievement(achievementId), incNum, f);
-            }
-
-            @Override
-            public boolean unlockAchievement(String achievementId) {
-                return super.unlockAchievement(GpgsMappers.mapToGpgsAchievement(achievementId));
-            }
-
-            @Override
             public boolean submitEvent(String eventId, int increment) {
                 return super.submitEvent(GpgsMappers.mapToGpgsEvent(eventId), increment);
             }
-        }.initialize(this, false);
+        }.setGpgsAchievementIdMapper(new IGameServiceIdMapper<String>() {
+            @Override
+            public String mapToGsId(String independantId) {
+                return GpgsMappers.mapToGpgsAchievement(independantId);
+            }
+        }).setGpgsLeaderboardIdMapper(new IGameServiceIdMapper<String>() {
+            @Override
+            public String mapToGsId(String independantId) {
+                return GpgsMappers.mapToGpgsLeaderboard(independantId);
+            }
+        }).initialize(this, false);
         game.gsClient = this.gpgsClient;
         initialize(game, config);
     }
