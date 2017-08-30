@@ -52,7 +52,7 @@ public class GdxGameSvcsApp extends ApplicationAdapter implements IGameServiceLi
 
     @Override
     public void create() {
-        stage = new Stage(new ExtendViewport(800, 600));
+        stage = new Stage(new ExtendViewport(800, 450));
         Gdx.input.setInputProcessor(stage);
 
         prepareSkin();
