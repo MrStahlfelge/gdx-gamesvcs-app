@@ -33,7 +33,7 @@ public class AndroidLauncher extends AndroidApplication {
             public String mapToGsId(String independantId) {
                 return GpgsMappers.mapToGpgsLeaderboard(independantId);
             }
-        }).initialize(this, false);
+        }).initialize(this, true);
         game.gsClient = this.gpgsClient;
         initialize(game, config);
     }
