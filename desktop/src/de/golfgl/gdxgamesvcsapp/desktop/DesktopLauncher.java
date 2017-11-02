@@ -32,7 +32,7 @@ public class DesktopLauncher {
                         return GpgsMappers.mapToGpgsLeaderboard(independantId);
                     }
                 }).initialize("gdx-gamesvcs-desktop-gpgs",
-                        Gdx.files.internal("gpgs-client_secret.json"));
+                        Gdx.files.internal("gpgs-client_secret.json"), true);
                 super.create();
 
             }
