@@ -87,9 +87,9 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html:$gamsvcsVersion"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html-gpgs:$gamsvcsVersion"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion:sources"
-        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html:$gamsvcsVersion:sources"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html-gpgs:$gamsvcsVersion:sources"
     }
 }
 
