@@ -24,7 +24,7 @@ allprojects {
         appName = "gdx-gamesvcs-app"
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.5'
-        gamsvcsVersion = '0.2.4-SNAPSHOT'
+        gamsvcsVersion = '0.2.5-SNAPSHOT'
     }
 
     repositories {
@@ -103,19 +103,6 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion"
-    }
-}
-
-project(":ios-moe") {
-    apply plugin: "moe"
-
-    configurations { natives }
-
-    dependencies {
-        compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-moe:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios-moe:$gamsvcsVersion"
     }
 }
 
