@@ -10,7 +10,7 @@ buildscript {
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
         classpath 'com.android.tools.build:gradle:3.2.0'
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.10-SNAPSHOT'
         classpath 'org.multi-os-engine:moe-gradle:1.2.3'
     }
 }
@@ -22,9 +22,9 @@ allprojects {
     version = '1.0'
     ext {
         appName = "gdx-gamesvcs-app"
-        gdxVersion = '1.9.8'
-        roboVMVersion = '2.3.5'
-        gamsvcsVersion = '0.2.5-SNAPSHOT'
+        gdxVersion = '1.9.10'
+        roboVMVersion = '2.3.10-SNAPSHOT'
+        gamsvcsVersion = '1.0.2'
     }
 
     repositories {
@@ -76,7 +76,7 @@ project(":ios") {
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios:$gamsvcsVersion"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios-gamecenter:$gamsvcsVersion"
     }
 }
 
